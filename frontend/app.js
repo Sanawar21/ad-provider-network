@@ -379,7 +379,7 @@ async function requestAd() {
     document.getElementById('ad-image').src = 'https://via.placeholder.com/600x300?text=Sample+Ad';
     
     // Update balance (in real app, this would come from backend)
-    currentUser.balance += 0.10;
+    currentUser.balance += 0.06;
     document.getElementById('cp-earnings').textContent = `$${currentUser.balance.toFixed(2)}`;
     document.getElementById('nav-user-balance').textContent = `$${currentUser.balance.toFixed(2)}`;
 }
@@ -405,6 +405,7 @@ async function createCampaign(event) {
     const category = document.getElementById('campaign-category').value;
     const budget = parseFloat(document.getElementById('campaign-budget').value);
     const imageFile = document.getElementById('campaign-image').files[0];
+    const redirectUrl = document.getElementById('redirect-url').value || 'http://redirectedwebsite.com';
     
     // Validate budget
     if (budget > currentUser.balance) {
@@ -416,7 +417,8 @@ async function createCampaign(event) {
         name,
         description,
         category,
-        budget
+        budget,
+        redirect_website_url: redirectUrl
     };
     
     // Convert image to base64 if provided
@@ -446,8 +448,8 @@ async function createCampaign(event) {
             showToast('Campaign created successfully!', 'success');
             
             // Update balance and stats
-            currentUser.balance -= budget;
-            currentUser.total_spent = (currentUser.total_spent || 0) + budget;
+            // currentUser.balance -= budget;
+            // currentUser.total_spent = (currentUser.total_spent || 0) + budget;
             currentUser.campaigns = currentUser.campaigns || [];
             currentUser.campaigns.push(data.campaign.id);
             

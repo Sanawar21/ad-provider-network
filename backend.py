@@ -196,6 +196,8 @@ def create_ad_campaign():
     try:
         data = request.get_json()
         
+        redirect_website_url = data.get('redirect_website_url', 'http://redirectedwebsite.com')
+
         # Validate required fields
         if not data or not all(k in data for k in ['name', 'budget', 'category']):
             return jsonify({'error': 'Missing required fields (name, budget, category)'}), 400
@@ -246,7 +248,8 @@ def create_ad_campaign():
             category=category,
             status=CampaignStatus.ACTIVE,
             created_at=str(datetime.utcnow()),
-            image=image_data
+            image=image_data,
+            redirect_website_url=redirect_website_url
         )
         
         # Save campaign to database
@@ -440,15 +443,15 @@ def update_website_url():
 
 @app.route('/api/get-ad', methods=['GET'])
 def get_ad():
-    """
-    Serve an ad based on website URL and user fingerprint
-    Returns a targeted ad from campaign database or fallback to random ad
-    
-    Query parameters:
-    - website_url: The URL of the requesting website
-    - fingerprint: User's browser fingerprint for tracking
-    """
-    try:
+        """
+        Serve an ad based on website URL and user fingerprint
+        Returns a targeted ad from campaign database or fallback to random ad
+
+        Query parameters:
+        - website_url: The URL of the requesting website
+        - fingerprint: User's browser fingerprint for tracking
+        """
+    # try:
         website_url = request.args.get('website_url')
         fingerprint_id = request.args.get('fingerprint')
         ad_space_id = request.args.get('ad_space_id')
@@ -490,9 +493,9 @@ def get_ad():
         return jsonify({'error': 'No ad available'}), 404
 
         
-    except Exception as e:
-        print(e)
-        return jsonify({'error': str(e)}), 500
+    # except Exception as e:
+    #     print(e)
+    #     return jsonify({'error': str(e)}), 500
 
 @app.route('/api/ad-clicked', methods=['GET'])
 def ad_clicked():
@@ -512,7 +515,7 @@ def ad_clicked():
 
         campaign.spent += 0.1
         sponsor.total_spent += 0.1
-        content_partner.balance += 0.1
+        content_partner.balance += 0.06
         fingerprint.campaigns_clicked.append(campaign_id)
         if campaign.category.value not in fingerprint.interests:
             fingerprint.interests.append(campaign.category.value)

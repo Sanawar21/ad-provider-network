@@ -48,7 +48,7 @@
             <div class="feature-card">
                 <div class="feature-icon">💰</div>
                 <h3>Earn Revenue</h3>
-                <p>Content partners earn $0.10 per ad display</p>
+                <p>Content partners earn $0.06 per ad click</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
@@ -161,9 +161,9 @@
                             <span class="step-number">2</span>
                             <div class="step-content">
                                 <h4>Add Ad Spaces</h4>
-                                <p>Add the following class to any element where you want ads to appear and give a unique ID:</p>
+                                <p>Add the following class to any element where you want ads to appear:</p>
                                 <div class="code-block">
-                                    <code>&lt;div class="apn-ad-space" id="unique-ad-space-id"&gt;&lt;/div&gt;</code>
+                                    <code>&lt;div class="apn-ad-space"&gt;&lt;/div&gt;</code>
                                     <button class="btn-copy" onclick="copyAdSpaceCode()">📋 Copy</button>
                                 </div>
                                 <p class="note">💡 You can add multiple ad spaces on the same page</p>
@@ -174,7 +174,7 @@
                             <span class="step-number">3</span>
                             <div class="step-content">
                                 <h4>Earn Money!</h4>
-                                <p>Ads will automatically load and you'll earn <strong>$0.10</strong> for each ad displayed</p>
+                                <p>Ads will automatically load and you'll earn <strong>$0.06</strong> for each ad click</p>
                             </div>
                         </div>
                     </div>
@@ -262,6 +262,10 @@
                             <input type="text" id="campaign-name" required>
                         </div>
                         <div class="form-group">
+                            <label for="redirect-url">Redirect URL</label>
+                            <input type="url" id="redirect-url" placeholder="http://redirectedwebsite.com">
+                        </div>
+                        <div class="form-group">
                             <label for="campaign-description">Description</label>
                             <textarea id="campaign-description" rows="3"></textarea>
                         </div>
@@ -271,7 +275,8 @@
                                 <option value="">Select a category</option>
                                 <option value="food">🍔 Food</option>
                                 <option value="cosmetics">💄 Cosmetics</option>
-                                <option value="other">📦 Other</option>
+                                <option value="clothes">👗 Clothes</option>
+                                <option value="watches">⌚ Watches</option>
                             </select>
                         </div>
                         <div class="form-group">

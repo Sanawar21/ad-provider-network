@@ -37,12 +37,12 @@
     function loadAdsInElements() {
       const adSpaces = document.getElementsByClassName('apn-ad-space');
       console.log('APN: Found ad spaces:', adSpaces.length);
-      
+      let i = 1;
       Array.from(adSpaces).forEach(adSpace => {
         // Skip if already loaded
         if (adSpace.dataset.adLoaded === 'true') return;
-        adSpace.id = adSpace.id || `apn-ad-space-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        
+        adSpace.id = adSpace.id || `apn-ad-space-${i}`;
+        i += 1;
         // Add unique slot ID to ensure different ads for each space
         const slotId = ++adSpaceCounter;
         const adUrl = `${APN_API_URL}/get-ad?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&ad_space_id=${encodeURIComponent(adSpace.id)}&slot=${slotId}&cache_bust=${Date.now()}`;

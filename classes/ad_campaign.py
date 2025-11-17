@@ -11,7 +11,8 @@ class CampaignStatus(str, Enum):
 class CampaignCategory(str, Enum):
   FOOD = "food"
   COSMETICS = "cosmetics"
-  OTHER = "other"
+  CLOTHES = "clothes"
+  WATCHES = "watches"
 
 class AdCampaign(BaseModel):
   id: Optional[str] = None
