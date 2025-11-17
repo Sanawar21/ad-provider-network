@@ -63,12 +63,133 @@ function showDashboard() {
 function updateContentPartnerDashboard() {
     document.getElementById('cp-earnings').textContent = `$${currentUser.balance.toFixed(2)}`;
     document.getElementById('cp-website').textContent = currentUser.website_url || '-';
+    
+    // Pre-fill the website URL input field
+    const websiteInput = document.getElementById('cp-new-website');
+    if (websiteInput && currentUser.website_url) {
+        websiteInput.value = currentUser.website_url;
+    }
+    
+    // Update script tag with current domain
+    const currentDomain = window.location.origin;
+    const scriptTag = `<script src="${currentDomain}/apn-ads.js"></script>`;
+    document.getElementById('script-tag-code').textContent = scriptTag;
 }
 
 function updateAdSponsorDashboard() {
     document.getElementById('as-balance').textContent = `$${currentUser.balance.toFixed(2)}`;
     document.getElementById('as-spent').textContent = `$${currentUser.total_spent?.toFixed(2) || '0.00'}`;
     document.getElementById('as-campaigns').textContent = currentUser.campaigns?.length || 0;
+    
+    // Load campaigns
+    loadCampaigns();
+}
+
+async function loadCampaigns() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/campaigns`, {
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayCampaigns(data.campaigns);
+            
+            // Update active campaigns counter
+            const activeCampaigns = data.campaigns.filter(c => c.status === 'active').length;
+            document.getElementById('as-campaigns').textContent = activeCampaigns;
+        } else {
+            console.error('Failed to load campaigns');
+        }
+    } catch (error) {
+        console.error('Error loading campaigns:', error);
+    }
+}
+
+function displayCampaigns(campaigns) {
+    const listContainer = document.getElementById('campaigns-list');
+    
+    if (!campaigns || campaigns.length === 0) {
+        listContainer.innerHTML = '<p class="no-campaigns">No campaigns yet. Create your first campaign below!</p>';
+        return;
+    }
+    
+    listContainer.innerHTML = campaigns.map(campaign => `
+        <div class="campaign-item">
+            <div class="campaign-header">
+                <div>
+                    <h4>${campaign.name}</h4>
+                    <span class="campaign-category">${getCategoryIcon(campaign.category)} ${campaign.category}</span>
+                </div>
+                <span class="campaign-status status-${campaign.status}">${campaign.status}</span>
+            </div>
+            <p class="campaign-description">${campaign.description || 'No description'}</p>
+            <div class="campaign-stats">
+                <span>💰 Budget: $${campaign.budget.toFixed(2)}</span>
+                <span>📊 Spent: $${campaign.spent.toFixed(2)}</span>
+                <span>🔗 <a href="${campaign.redirect_website_url}" target="_blank">Redirect URL</a></span>
+            </div>
+            <div class="campaign-actions">
+                ${campaign.status === 'active' ? 
+                    `<button class="btn-secondary-small" onclick="toggleCampaignStatus('${campaign.id}', 'paused')">⏸️ Pause</button>` :
+                    `<button class="btn-primary-small" onclick="toggleCampaignStatus('${campaign.id}', 'active')">▶️ Resume</button>`
+                }
+            </div>
+        </div>
+    `).join('');
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'food': '🍔',
+        'cosmetics': '💄',
+        'other': '📦'
+    };
+    return icons[category] || '📦';
+}
+
+// Copy functions for integration instructions
+function copyScriptTag() {
+    const code = document.getElementById('script-tag-code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Script tag copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy. Please copy manually.', 'error');
+    });
+}
+
+function copyAdSpaceCode() {
+    const code = '<div class="apn-ad-space"></div>';
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Ad space code copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy. Please copy manually.', 'error');
+    });
+}
+
+async function toggleCampaignStatus(campaignId, newStatus) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/campaigns/${campaignId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ status: newStatus })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(`Campaign ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
+            loadCampaigns(); // Reload campaigns list
+        } else {
+            showToast(data.error || 'Failed to update campaign status', 'error');
+        }
+    } catch (error) {
+        console.error('Toggle campaign status error:', error);
+        showToast('Network error. Please try again.', 'error');
+    }
 }
 
 // Modal Functions
@@ -210,6 +331,41 @@ async function logout() {
 }
 
 // Content Partner Functions
+async function updateWebsiteUrl(event) {
+    event.preventDefault();
+    
+    const newWebsiteUrl = document.getElementById('cp-new-website').value;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/update-website`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ website_url: newWebsiteUrl })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Website URL updated successfully!', 'success');
+            
+            // Update displayed website URL
+            currentUser.website_url = newWebsiteUrl;
+            document.getElementById('cp-website').textContent = newWebsiteUrl;
+            
+            // Clear form
+            event.target.reset();
+        } else {
+            showToast(data.error || 'Failed to update website URL', 'error');
+        }
+    } catch (error) {
+        console.error('Update website URL error:', error);
+        showToast('Network error. Please try again.', 'error');
+    }
+}
+
 async function requestAd() {
     // This is a placeholder - you'll need to implement the backend endpoint
     showToast('Feature coming soon: Request ad from available campaigns', 'success');

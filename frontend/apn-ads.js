@@ -4,7 +4,8 @@
 (function() {
   'use strict';
 
-  const APN_API_URL = 'http://localhost:5000/api/get-ad';
+  // const APN_API_URL = 'http://adprovider.com/api/get-ad';
+  const APN_API_URL = 'http://localhost/api';
 
   async function getFingerprint() {
     const components = [
@@ -40,10 +41,11 @@
       Array.from(adSpaces).forEach(adSpace => {
         // Skip if already loaded
         if (adSpace.dataset.adLoaded === 'true') return;
+        adSpace.id = adSpace.id || `apn-ad-space-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         
         // Add unique slot ID to ensure different ads for each space
         const slotId = ++adSpaceCounter;
-        const adUrl = `${APN_API_URL}?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&slot=${slotId}&cache_bust=${Date.now()}`;
+        const adUrl = `${APN_API_URL}/get-ad?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&ad_space_id=${encodeURIComponent(adSpace.id)}&slot=${slotId}&cache_bust=${Date.now()}`;
         
         // Create img element for the ad
         const img = document.createElement('img');
@@ -64,7 +66,7 @@
         
         // Add click handler
         adSpace.addEventListener('click', () => {
-          const clickUrl = `${APN_API_URL}?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}`;
+          const clickUrl = `${APN_API_URL}/ad-clicked?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&ad_space_id=${encodeURIComponent(adSpace.id)}`;
           fetch(clickUrl, { method: 'GET' })
             .then(res => res.json())
             .then(data => {

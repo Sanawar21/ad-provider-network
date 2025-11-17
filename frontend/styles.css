@@ -577,6 +577,234 @@ body {
     border-left: 4px solid var(--error-color);
 }
 
+/* Campaign List Styles */
+.campaign-list-card {
+    background: var(--bg-white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+.campaign-list-card h3 {
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+.no-campaigns {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+    font-style: italic;
+}
+
+.campaign-item {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.campaign-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.campaign-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.campaign-header h4 {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.campaign-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.campaign-status {
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: capitalize;
+}
+
+.campaign-status.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.campaign-status.status-paused {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.campaign-status.status-completed {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.campaign-description {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.campaign-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.campaign-stats span {
+    font-size: 0.875rem;
+    color: var(--text-dark);
+}
+
+.campaign-stats a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.campaign-stats a:hover {
+    text-decoration: underline;
+}
+
+.campaign-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-secondary-small, .btn-primary-small {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.875rem;
+}
+
+.btn-primary-small {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-primary-small:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary-small {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary-small:hover {
+    background: var(--border-color);
+}
+
+/* Integration Instructions Styles */
+.integration-steps {
+    margin-top: 1.5rem;
+}
+
+.step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.step-content p {
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+}
+
+.code-block {
+    background: #f3f4f6;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 0.75rem 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.code-block code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    word-break: break-all;
+    flex: 1;
+}
+
+.btn-copy {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-copy:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.note {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }

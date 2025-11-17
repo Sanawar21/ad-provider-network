@@ -57,10 +57,14 @@ class Database:
 
   def get_ad_campaign(self, campaign_id: str) -> Optional[AdCampaign]:
     CampaignQuery = Query()
-    result = self.campaigns_table.get(CampaignQuery.campaign_id == campaign_id)
+    result = self.campaigns_table.get(CampaignQuery.id == campaign_id)
     if result:
       return AdCampaign.model_validate(result)
     return None
+  
+  def get_campaign_by_id(self, campaign_id: str) -> Optional[AdCampaign]:
+    """Alias for get_ad_campaign for consistency"""
+    return self.get_ad_campaign(campaign_id)
 
   def get_active_campaigns(self) -> list[AdCampaign]:
     campaigns = []
@@ -84,4 +88,8 @@ class Database:
   def update_fingerprint(self, fingerprint: Fingerprint) -> None:
     FingerprintQuery = Query()
     self.fingerprints_table.update(fingerprint.model_dump(), FingerprintQuery.id == fingerprint.id)
+
+  def update_campaign(self, campaign: AdCampaign) -> None:
+    CampaignQuery = Query()
+    self.campaigns_table.update(campaign.model_dump(), CampaignQuery.id == campaign.id)
 

@@ -138,6 +138,48 @@
                 <h1>📰 Content Partner Dashboard</h1>
                 <p>Monetize your content by displaying advertisements</p>
             </div>
+
+            <div class="action-section">
+                <div class="action-card">
+                    <h3>📺 Integration Instructions</h3>
+                    <p>Follow these steps to display ads on your website:</p>
+                    
+                    <div class="integration-steps">
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <h4>Add the Script Tag</h4>
+                                <p>Include this script in your website's HTML (before closing <code>&lt;/body&gt;</code> tag):</p>
+                                <div class="code-block">
+                                    <code id="script-tag-code"></code>
+                                    <button class="btn-copy" onclick="copyScriptTag()">📋 Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <h4>Add Ad Spaces</h4>
+                                <p>Add the following class to any element where you want ads to appear and give a unique ID:</p>
+                                <div class="code-block">
+                                    <code>&lt;div class="apn-ad-space" id="unique-ad-space-id"&gt;&lt;/div&gt;</code>
+                                    <button class="btn-copy" onclick="copyAdSpaceCode()">📋 Copy</button>
+                                </div>
+                                <p class="note">💡 You can add multiple ad spaces on the same page</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <h4>Earn Money!</h4>
+                                <p>Ads will automatically load and you'll earn <strong>$0.10</strong> for each ad displayed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="stats-grid">
                 <div class="stat-card">
@@ -158,21 +200,15 @@
 
             <div class="action-section">
                 <div class="action-card">
-                    <h3>Request Advertisement</h3>
-                    <p>Display an ad on your platform and earn $0.10</p>
-                    <button class="btn-primary" onclick="requestAd()">Request New Ad</button>
-                </div>
-                
-                <div class="ad-display-card" id="ad-display-container" style="display: none;">
-                    <h3>Current Advertisement</h3>
-                    <div class="ad-content" id="ad-content">
-                        <img id="ad-image" src="" alt="Advertisement">
-                        <div class="ad-details">
-                            <h4 id="ad-name"></h4>
-                            <p id="ad-description"></p>
+                    <h3>Update Website URL</h3>
+                    <p>Change the website URL associated with your account</p>
+                    <form onsubmit="updateWebsiteUrl(event)">
+                        <div class="form-group">
+                            <label for="cp-new-website">New Website URL</label>
+                            <input type="url" id="cp-new-website" placeholder="https://example.com" required>
                         </div>
-                    </div>
-                    <p class="success-message">✅ Ad displayed! You earned $0.10</p>
+                        <button type="submit" class="btn-primary">Update Website URL</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -204,6 +240,15 @@
                     <div class="stat-info">
                         <p class="stat-label">Active Campaigns</p>
                         <p class="stat-value" id="as-campaigns">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <div class="campaign-list-card">
+                    <h3>My Campaigns</h3>
+                    <div id="campaigns-list">
+                        <p class="no-campaigns">No campaigns yet. Create your first campaign below!</p>
                     </div>
                 </div>
             </div>

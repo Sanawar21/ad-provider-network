@@ -258,8 +258,8 @@ def create_ad_campaign():
             db.update_user(sponsor)
         
         # Deduct budget from sponsor's balance
-        sponsor.balance -= data['budget']
-        sponsor.total_spent += data['budget']
+        # sponsor.balance -= data['budget']
+        # sponsor.total_spent += data['budget']
         db.update_user(sponsor)
         
         return jsonify({
@@ -304,8 +304,135 @@ def get_current_user():
                 'email': user.email,
                 'user_type': user.user_type,
                 'balance': user.balance,
-                'created_at': user.created_at
+                'created_at': user.created_at,
+                'website_url': user.website_url if isinstance(user, ContentPartner) else None,
+                'total_spent': user.total_spent if isinstance(user, AdSponsor) else None
             }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns', methods=['GET'])
+def get_campaigns():
+    """Get all campaigns for the logged-in ad sponsor"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    # Verify user is an ad sponsor
+    if session.get('user_type') != UserType.AD_SPONSOR:
+        return jsonify({'error': 'Only ad sponsors can view campaigns'}), 403
+    
+    try:
+        sponsor = db.get_user_by_id(session['user_id'])
+        if not sponsor:
+            return jsonify({'error': 'User not found'}), 404
+        
+        campaigns = []
+        if isinstance(sponsor, AdSponsor) and sponsor.campaigns:
+            for campaign_id in sponsor.campaigns:
+                campaign = db.get_campaign_by_id(campaign_id)
+                if campaign:
+                    campaigns.append({
+                        'id': campaign.id,
+                        'name': campaign.name,
+                        'description': campaign.description,
+                        'category': campaign.category,
+                        'budget': campaign.budget,
+                        'spent': campaign.spent,
+                        'status': campaign.status,
+                        'created_at': campaign.created_at,
+                        'has_image': campaign.image is not None,
+                        'redirect_website_url': campaign.redirect_website_url
+                    })
+        
+        return jsonify({'campaigns': campaigns}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns/<campaign_id>', methods=['PATCH'])
+def update_campaign_status(campaign_id):
+    """Update campaign status (pause/resume)"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    # Verify user is an ad sponsor
+    if session.get('user_type') != UserType.AD_SPONSOR:
+        return jsonify({'error': 'Only ad sponsors can update campaigns'}), 403
+    
+    try:
+        data = request.get_json()
+        
+        if not data or 'status' not in data:
+            return jsonify({'error': 'Missing status field'}), 400
+        
+        # Validate status
+        try:
+            new_status = CampaignStatus(data['status'])
+        except ValueError:
+            return jsonify({'error': 'Invalid status. Must be "active", "paused", or "completed"'}), 400
+        
+        # Get campaign
+        campaign = db.get_campaign_by_id(campaign_id)
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Verify ownership
+        if campaign.sponsor_id != session['user_id']:
+            return jsonify({'error': 'You do not have permission to update this campaign'}), 403
+        
+        # Update status
+        campaign.status = new_status
+        db.update_campaign(campaign)
+        
+        return jsonify({
+            'message': 'Campaign status updated successfully',
+            'campaign': {
+                'id': campaign.id,
+                'name': campaign.name,
+                'status': campaign.status
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/update-website', methods=['PUT'])
+def update_website_url():
+    """Update content partner's website URL"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    # Verify user is a content partner
+    if session.get('user_type') != UserType.CONTENT_PARTNER:
+        return jsonify({'error': 'Only content partners can update website URL'}), 403
+    
+    try:
+        data = request.get_json()
+        
+        if not data or 'website_url' not in data:
+            return jsonify({'error': 'Missing website_url field'}), 400
+        
+        new_website_url = data['website_url']
+        
+        # Check if website already registered by another user
+        existing_website = db.get_content_partner_by_website(new_website_url)
+        if existing_website and existing_website.user_id != session['user_id']:
+            return jsonify({'error': 'This website is already registered by another user'}), 409
+        
+        # Get current user
+        user = db.get_user_by_id(session['user_id'])
+        if not user or not isinstance(user, ContentPartner):
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Update website URL
+        user.website_url = new_website_url
+        db.update_user(user)
+        
+        return jsonify({
+            'message': 'Website URL updated successfully',
+            'website_url': new_website_url
         }), 200
         
     except Exception as e:
@@ -324,6 +451,7 @@ def get_ad():
     try:
         website_url = request.args.get('website_url')
         fingerprint_id = request.args.get('fingerprint')
+        ad_space_id = request.args.get('ad_space_id')
 
         
         if not website_url or not fingerprint_id:
@@ -348,6 +476,7 @@ def get_ad():
 
         if campaign and campaign.image:
             fingerprint.campaigns_shown.append(campaign.id)
+            fingerprint.loaded_ad_spaces[ad_space_id+website_url] = campaign.id
             db.update_fingerprint(fingerprint)
 
             # Decode base64 string to bytes  
@@ -362,6 +491,7 @@ def get_ad():
 
         
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/ad-clicked', methods=['GET'])
@@ -369,12 +499,13 @@ def ad_clicked():
     try:
         website_url = request.args.get('website_url')
         fingerprint_id = request.args.get('fingerprint')
+        ad_space_id = request.args.get('ad_space_id')
 
         if not fingerprint_id or not website_url:
             return jsonify({'error': 'Missing fingerprint or website_url'}), 400
 
         fingerprint = db.get_fingerprint_by_id(fingerprint_id)
-        campaign_id = fingerprint.campaigns_shown[-1]
+        campaign_id = fingerprint.loaded_ad_spaces.get(ad_space_id+website_url)
         campaign = db.get_ad_campaign(campaign_id)
         sponsor = db.get_ad_sponsor_by_campaign(campaign_id)
         content_partner = db.get_content_partner_by_website(website_url)
@@ -385,7 +516,12 @@ def ad_clicked():
         fingerprint.campaigns_clicked.append(campaign_id)
         if campaign.category.value not in fingerprint.interests:
             fingerprint.interests.append(campaign.category.value)
-
+        
+        db.update_campaign(campaign)
+        db.update_user(sponsor)
+        db.update_user(content_partner)
+        db.update_fingerprint(fingerprint)
+        
         return jsonify({'redirect': campaign.redirect_website_url}), 200
 
     except Exception as e:
