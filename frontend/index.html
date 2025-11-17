@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Provider Network - Connect & Monetize</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">📺</span>
+                <span class="logo-text">AdNetwork</span>
+            </a>
+            <div class="nav-menu">
+                <div id="nav-auth-links">
+                    <a href="#" class="nav-link" onclick="showLogin()">Login</a>
+                    <a href="#" class="btn-primary-small" onclick="showRegister()">Get Started</a>
+                </div>
+                <div id="nav-user-info" style="display: none;">
+                    <span class="user-name" id="nav-user-name"></span>
+                    <span class="user-balance" id="nav-user-balance"></span>
+                    <button class="btn-secondary-small" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Connect Content Partners with Ad Sponsors</h1>
+            <p class="hero-subtitle">The modern platform for monetizing content and reaching audiences</p>
+            <div class="hero-buttons">
+                <button class="btn-primary-large" onclick="showRegister('content_partner')">
+                    <span class="btn-icon">📰</span>
+                    Join as Content Partner
+                </button>
+                <button class="btn-secondary-large" onclick="showRegister('ad_sponsor')">
+                    <span class="btn-icon">📢</span>
+                    Join as Ad Sponsor
+                </button>
+            </div>
+        </div>
+        <div class="hero-features">
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Earn Revenue</h3>
+                <p>Content partners earn $0.10 per ad display</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Reach Audience</h3>
+                <p>Ad sponsors connect with quality content</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Setup</h3>
+                <p>Get started in minutes, no hassle</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <h2>Welcome Back</h2>
+                <p class="form-subtitle">Sign in to your account</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary-full">Sign In</button>
+                </form>
+                <p class="form-switch">
+                    Don't have an account? <a href="#" onclick="showRegister()">Sign up</a>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <h2>Create Account</h2>
+                <p class="form-subtitle">Join our network today</p>
+                <form onsubmit="handleRegister(event)">
+                    <div class="user-type-selector">
+                        <button type="button" class="type-btn active" data-type="content_partner" onclick="selectUserType('content_partner')">
+                            <span class="type-icon">📰</span>
+                            <span>Content Partner</span>
+                        </button>
+                        <button type="button" class="type-btn" data-type="ad_sponsor" onclick="selectUserType('ad_sponsor')">
+                            <span class="type-icon">📢</span>
+                            <span>Ad Sponsor</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="register-user-type" value="content_partner">
+                    
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group" id="website-url-group">
+                        <label for="register-website">Website URL</label>
+                        <input type="url" id="register-website" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary-full">Create Account</button>
+                </form>
+                <p class="form-switch">
+                    Already have an account? <a href="#" onclick="showLogin()">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard" id="dashboard-section" style="display: none;">
+        <!-- Content Partner Dashboard -->
+        <div id="content-partner-dashboard" style="display: none;">
+            <div class="dashboard-header">
+                <h1>📰 Content Partner Dashboard</h1>
+                <p>Monetize your content by displaying advertisements</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Earnings</p>
+                        <p class="stat-value" id="cp-earnings">$0.00</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <p class="stat-label">Website</p>
+                        <p class="stat-value-small" id="cp-website">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <div class="action-card">
+                    <h3>Request Advertisement</h3>
+                    <p>Display an ad on your platform and earn $0.10</p>
+                    <button class="btn-primary" onclick="requestAd()">Request New Ad</button>
+                </div>
+                
+                <div class="ad-display-card" id="ad-display-container" style="display: none;">
+                    <h3>Current Advertisement</h3>
+                    <div class="ad-content" id="ad-content">
+                        <img id="ad-image" src="" alt="Advertisement">
+                        <div class="ad-details">
+                            <h4 id="ad-name"></h4>
+                            <p id="ad-description"></p>
+                        </div>
+                    </div>
+                    <p class="success-message">✅ Ad displayed! You earned $0.10</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad Sponsor Dashboard -->
+        <div id="ad-sponsor-dashboard" style="display: none;">
+            <div class="dashboard-header">
+                <h1>📢 Ad Sponsor Dashboard</h1>
+                <p>Create and manage your advertising campaigns</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💵</div>
+                    <div class="stat-info">
+                        <p class="stat-label">Available Budget</p>
+                        <p class="stat-value" id="as-balance">$100.00</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Spent</p>
+                        <p class="stat-value" id="as-spent">$0.00</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <p class="stat-label">Active Campaigns</p>
+                        <p class="stat-value" id="as-campaigns">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <div class="campaign-form-card">
+                    <h3>Create New Campaign</h3>
+                    <form onsubmit="createCampaign(event)">
+                        <div class="form-group">
+                            <label for="campaign-name">Campaign Name</label>
+                            <input type="text" id="campaign-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaign-description">Description</label>
+                            <textarea id="campaign-description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaign-category">Product Category</label>
+                            <select id="campaign-category" required>
+                                <option value="">Select a category</option>
+                                <option value="food">🍔 Food</option>
+                                <option value="cosmetics">💄 Cosmetics</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaign-budget">Budget ($)</label>
+                            <input type="number" id="campaign-budget" min="0.1" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaign-image">Advertisement Image</label>
+                            <input type="file" id="campaign-image" accept="image/*" onchange="previewImage(event)">
+                            <div class="image-preview" id="image-preview" style="display: none;">
+                                <img id="preview-img" src="" alt="Preview">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Campaign</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

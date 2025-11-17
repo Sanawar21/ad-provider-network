@@ -1,0 +1,4 @@
+flask
+tinydb
+pydantic
+flask-cors
