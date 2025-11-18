@@ -39,6 +39,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         {children}
         <Analytics />
+        <script src="http://127.0.0.1/apn-ads.js"></script>
       </body>
     </html>
   )

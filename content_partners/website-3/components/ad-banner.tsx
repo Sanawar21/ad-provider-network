@@ -7,12 +7,12 @@ export default function AdBanner({ position = "horizontal" }: { position?: "hori
 
   return (
     <div
-      className={`${sizes[position]} bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg border border-border border-dashed flex items-center justify-center`}
+      className={`${sizes[position]} apn-ad-space bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg border border-border border-dashed flex items-center justify-center`}
     >
-      <div className="text-center">
+      {/* <div className="text-center">
         <p className="text-muted-foreground text-sm font-medium">Advertisement</p>
         <p className="text-xs text-muted-foreground">Your ad here</p>
-      </div>
+      </div> */}
     </div>
   )
 }

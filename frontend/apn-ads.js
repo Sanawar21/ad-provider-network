@@ -40,12 +40,14 @@
       let i = 1;
       Array.from(adSpaces).forEach(adSpace => {
         // Skip if already loaded
-        if (adSpace.dataset.adLoaded === 'true') return;
-        adSpace.id = adSpace.id || `apn-ad-space-${i}`;
+        // if (adSpace.dataset.adLoaded === 'true') return;
+        if (adSpace.children[0]) return;
+
+        let adSpaceID = adSpace.id || `apn-${i}-${adSpace.offsetTop}-${adSpace.offsetLeft}`;
         i += 1;
         // Add unique slot ID to ensure different ads for each space
         const slotId = ++adSpaceCounter;
-        const adUrl = `${APN_API_URL}/get-ad?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&ad_space_id=${encodeURIComponent(adSpace.id)}&slot=${slotId}&cache_bust=${Date.now()}`;
+        const adUrl = `${APN_API_URL}/get-ad?website_url=${encodeURIComponent(websiteUrl)}&fingerprint=${encodeURIComponent(fingerprint)}&ad_space_id=${encodeURIComponent(adSpaceID)}&slot=${slotId}&cache_bust=${Date.now()}`;
         
         // Create img element for the ad
         const img = document.createElement('img');
@@ -62,7 +64,7 @@
         };
         
         adSpace.appendChild(img);
-        adSpace.dataset.adLoaded = 'true';
+        // adSpace.dataset.adLoaded = 'true';
         
         // Add click handler
         adSpace.addEventListener('click', () => {

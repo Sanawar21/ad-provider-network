@@ -18,7 +18,7 @@ app.secret_key = "secret_key"
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": "*", "supports_credentials": True}})
 
 db = Database("data/db.json")
-
+LOCK_DB = False
 
 # Serve frontend
 @app.route('/')
@@ -237,8 +237,17 @@ def create_ad_campaign():
             except Exception as e:
                 return jsonify({'error': f'Invalid image data: {str(e)}'}), 400
         
-        # Create campaign
         campaign_id = str(uuid4())
+
+        # save image in data/campaigns folder as <campaign_id>.jpg
+        if image_data:
+            os.makedirs('data/campaigns', exist_ok=True)
+            campaign_image_path = f"data/campaigns/{campaign_id}.jpg"
+            with open(campaign_image_path, "wb") as img_file:
+                img_file.write(base64.b64decode(image_data))
+
+
+        # Create campaign
         campaign = AdCampaign(
             id=campaign_id,
             name=data['name'],
@@ -248,7 +257,7 @@ def create_ad_campaign():
             category=category,
             status=CampaignStatus.ACTIVE,
             created_at=str(datetime.utcnow()),
-            image=image_data,
+            image=campaign_image_path,
             redirect_website_url=redirect_website_url
         )
         
@@ -451,6 +460,10 @@ def get_ad():
         - website_url: The URL of the requesting website
         - fingerprint: User's browser fingerprint for tracking
         """
+        global LOCK_DB
+        while LOCK_DB:
+            pass
+        LOCK_DB = True
     # try:
         website_url = request.args.get('website_url')
         fingerprint_id = request.args.get('fingerprint')
@@ -458,6 +471,7 @@ def get_ad():
 
         
         if not website_url or not fingerprint_id:
+            LOCK_DB = False
             return jsonify({'error': 'Missing website_url or fingerprint parameters'}), 400
         
         fingerprint = db.get_fingerprint_by_id(fingerprint_id)
@@ -469,6 +483,7 @@ def get_ad():
         content_partner = db.get_content_partner_by_website(website_url)
         
         if not content_partner:
+            LOCK_DB = False
             return jsonify({'error': 'Website not registered as content partner'}), 404
 
         if fingerprint.interests:
@@ -483,13 +498,18 @@ def get_ad():
             db.update_fingerprint(fingerprint)
 
             # Decode base64 string to bytes  
-            image_bytes = base64.b64decode(campaign.image)
+            image_path = campaign.image
+            with open(image_path, "rb") as img_file:
+                image_bytes = img_file.read()
+                
+            LOCK_DB = False
             return send_file(
                 io.BytesIO(image_bytes),
                 mimetype='image/jpeg',
                 as_attachment=False
             )
         
+        LOCK_DB = False
         return jsonify({'error': 'No ad available'}), 404
 
         

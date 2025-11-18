@@ -23,10 +23,7 @@ export default function RootLayout({
       <body className={`${poppins.className} font-sans antialiased`}>
         {children}
         <Analytics />
-        <Script
-          src="http://127.0.0.1/apn-ads.js"
-          strategy="lazyOnload"
-        />
+        <script src="http://127.0.0.1/apn-ads.js"></script>
       </body>
     </html>
   )
